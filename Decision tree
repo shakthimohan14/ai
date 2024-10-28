@@ -1,0 +1,39 @@
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
+# Column names for the dataset
+col_names = ['pregnant', 'glucose', 'bp', 'skin', 'insulin', 'bmi', 'pedigree', 'age', 'label']
+
+# Load the dataset
+pima = pd.read_csv("diabetes.csv", header=None, names=col_names)
+
+# Feature columns
+feature_cols = ['pregnant', 'insulin', 'bmi', 'age', 'glucose', 'bp', 'pedigree']
+X = pima[feature_cols]
+y = pima['label']  # Use correct column name for target variable
+
+# Check for missing values
+print("Missing values in dataset:\n", pima.isnull().sum())
+
+# Convert to numeric if necessary
+X = X.apply(pd.to_numeric, errors='coerce')
+
+# Check for missing values again after conversion
+X.fillna(X.mean(), inplace=True)  # Fill any NaNs with column mean
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)
+
+# Create and train the model
+clf = DecisionTreeClassifier()
+clf.fit(X_train, y_train)  # Fit the model
+
+# Make predictions
+y_pred = clf.predict(X_test)  # Predict on test set
+
+# Print evaluation metrics
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("Classification Report:\n", classification_report(y_test, y_pred))
+print("Accuracy:", accuracy_score(y_test, y_pred))
